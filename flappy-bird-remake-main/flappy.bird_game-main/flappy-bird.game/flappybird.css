@@ -1,0 +1,49 @@
+body {
+    font-family: 'Courier New', Courier, monospace;
+    text-align: center;
+    margin: 0;
+    overflow: hidden;
+}
+
+#board {
+    display: block;
+    margin: 20px auto;
+    background-image: url('./Images/flappybirdbg.png'); /* Изменён путь */
+    border: 2px solid #000;
+}
+
+.game-button {
+    display: block;
+    margin: 10px auto;
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.game-button:hover {
+    background-color: #45a049;
+}
+
+#restart-button {
+    display: none; /* Скрыть кнопку по умолчанию */
+    padding: 10px 20px;
+    font-size: 20px;
+    color: white;
+    background-color: #da9c2a; /* Красный цвет */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    position: absolute; /* Позиционирование */
+    top: 50%; /* Центрирование по вертикали */
+    left: 50%; /* Центрирование по горизонтали */
+    transform: translate(-50%, -50%); /* Центрирование */
+}
+
+#restart-button:hover {
+    background-color: #ca8e1e; /* Более светлый красный при наведении */
+}
