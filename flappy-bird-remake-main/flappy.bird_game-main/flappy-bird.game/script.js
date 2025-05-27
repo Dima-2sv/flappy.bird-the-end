@@ -38,11 +38,13 @@ let score = 0;
 let highScore = 0;
 
 window.onload = function () {
+    // Инициализация канваса
     board = document.getElementById("board");
     board.height = boardHeight;
     board.width = boardWidth;
     context = board.getContext("2d");
 
+    // Загрузка изображений
     birdImg = new Image();
     birdImg.src = "./Images/flappybird.png"; 
 
@@ -52,15 +54,19 @@ window.onload = function () {
     bottomPipeImg = new Image();
     bottomPipeImg.src = "./Images/bottompipe.png"; 
 
+    // Запуск обновления и размещения труб
     requestAnimationFrame(update);
     setInterval(placePipes, 1500);
+    
+    // Обработка нажатий клавиш
     document.addEventListener("keydown", moveBird);
 
+    // Создание меню выбора сложности
     createDifficultyMenu();
 };
 
-// Меню выбора сложности
 function createDifficultyMenu() {
+    // Создаем меню выбора уровня
     const menu = document.createElement("div");
     menu.style.position = "absolute";
     menu.style.top = "50%";
@@ -74,6 +80,8 @@ function createDifficultyMenu() {
     menu.appendChild(title);
 
     const levels = ["easy", "normal", "hard"];
+    
+    // Создаем кнопки для уровней
     levels.forEach(level => {
         const button = document.createElement("button");
         button.innerText = level.charAt(0).toUpperCase() + level.slice(1);
@@ -85,17 +93,18 @@ function createDifficultyMenu() {
         button.style.border = "none";
         button.style.borderRadius = "5px";
         button.style.cursor = "pointer";
-        button.style.transition = "background-color 0.3s";
+        button.style.transition= "background-color 0.3s";
 
-        button.onmouseover = () => {
-            button.style.backgroundColor = "#45a049";
+        // Цвет при наведении
+        button.onmouseover= () => {
+            button.style.backgroundColor= "#45a049";
         };
-
-        button.onmouseout = () => {
-            button.style.backgroundColor = "#4CAF50";
+        // Возврат цвета при уходе
+        button.onmouseout= () => {
+            button.style.backgroundColor= "#4CAF50";
         };
-
-        button.onclick = () => {
+        // Установка сложности по клику
+        button.onclick= () => {
             setDifficulty(level);
             document.body.removeChild(menu);
         };
@@ -105,153 +114,156 @@ function createDifficultyMenu() {
     document.body.appendChild(menu);
 }
 
-// Настройка сложности
+// Настройка параметров сложности
 function setDifficulty(level) {
     switch (level) {
         case 'easy':
-            velocityX = -4; 
-            gravity = 0.1;
-            jumpStrength = -4;
-            openingSpace = 180; 
+            velocityX= -4; 
+            gravity= 0.1;
+            jumpStrength= -4;
+            openingSpace=180; 
             break;
         case 'normal':
-            velocityX = -6; 
-            gravity = 0.15;
-            jumpStrength = -4;
-            openingSpace = 200; 
+            velocityX= -6; 
+            gravity= 0.15;
+            jumpStrength= -4;
+            openingSpace=200; 
             break;
         case 'hard':
-            velocityX = -12; 
-            gravity = 0.2;
-            jumpStrength = -4.5;
-            openingSpace = 220; 
+            velocityX= -12; 
+            gravity= 0.2;
+            jumpStrength= -4.5;
+            openingSpace=220; 
             break;
     }
 }
 
-
-// Обновление игры
+// Обновление игры каждый кадр
 function update() {
     requestAnimationFrame(update);
 
-    if (gameOver) {
-        return;
-    }
+    if (gameOver) return; // Стоп, если игра окончена
 
-    context.clearRect(0, 0, board.width, board.height);
+    context.clearRect(0, 0, board.width, board.height); // Очистка экрана
 
+    // Физика птицы
     velocityY += gravity;
-    bird.y = Math.max(bird.y + velocityY, 0);
+    
+     // Обновление позиции птицы с учетом скорости и границ
+     bird.y= Math.max(bird.y + velocityY, 0);
 
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+     // Отрисовка птицы
+     context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
-    if (bird.y > board.height) {
-        gameOver = true; 
-        return;
-    }
+     // Проверка выхода за границы снизу (игра окончена)
+     if (bird.y > board.height) {
+         gameOver= true; 
+         return;
+     }
 
-    for (let i = 0; i < pipeArray.length; i++) {
-        let pipe = pipeArray[i];
-        pipe.x += velocityX;
-        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+     // Обработка труб и столкновений
+     for (let i=0; i< pipeArray.length; i++) {
+         let pipe= pipeArray[i];
+         pipe.x += velocityX; // Движение труб
 
-        if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-            score += 0.5;
-            pipe.passed = true;
-        }
+         context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-        if (detectCollision(bird, pipe)) {
-            gameOver = true; 
-        }
-    }
+         if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+             score += 0.5; // Засчитываем очко за пройденную пару труб
+             pipe.passed= true;
+         }
 
-    while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
-        pipeArray.shift();
-    }
+         if (detectCollision(bird, pipe)) {
+             gameOver= true; // Столкновение — конец игры
+         }
+     }
 
-    context.fillStyle = "white";
-    context.font = "45px sans-serif";
-    context.fillText(score, 5, 45);
+     // Удаление вышедших за границы труб
+     while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
+         pipeArray.shift();
+     }
 
-    if (gameOver) {
-        context.fillText("ИГРА ОКОНЧЕНА", 5, 90);
-        if (score > highScore) {
-            highScore = score;
-        }
-        context.fillText(`Рекорд: ${highScore}`, 5, 140);
-    }
+     // Отрисовка счета и статуса игры
+     context.fillStyle="white";
+     context.font="45px sans-serif";
+     context.fillText(score,5,45);
+
+     if (gameOver) {
+         context.fillText("ИГРА ОКОНЧЕНА",5,90);
+         if (score > highScore) highScore= score; // Обновление рекорда
+         context.fillText(`Рекорд: ${highScore}`,5,140);
+     }
 }
 
-// Размещение труб
+// Размещение новых труб через интервал времени
 function placePipes() {
-    if (gameOver) {
-        return;
-    }
+   if (gameOver) return;
 
-    let randomPipeY = Math.floor(Math.random() * (boardHeight - pipeHeight - 150)) + 50;
-    let openingSpace = Math.floor(Math.random() * 20) + 150; 
+   let randomPipeY= Math.floor(Math.random() * (boardHeight- pipeHeight-150)) +50;
 
-    // Проверяем, чтобы новые трубы не накладывались на старые
-    if (pipeArray.length > 0) {
-        let lastPipe = pipeArray[pipeArray.length - 1];
-        if (lastPipe.x > boardWidth - 200) { // Если последняя труба слишком близко, не спавним новую
-            setTimeout(placePipes, 300);
-            return;
-        }
-    }
+   let openingSpace= Math.floor(Math.random() *20)+150;
 
-    let topPipe = {
-        img: topPipeImg,
-        x: pipeX,
-        y: randomPipeY - pipeHeight,
-        width: pipeWidth,
-        height: pipeHeight,
-        passed: false
-    };
+   // Проверка на наложение новых труб на старые
+   if (pipeArray.length >0) {
+       let lastPipe= pipeArray[pipeArray.length-1];
+       if (lastPipe.x >boardWidth-200) { 
+           setTimeout(placePipes,300);
+           return;
+       }
+   }
 
-    let bottomPipe = {
-        img: bottomPipeImg,
-        x: pipeX,
-        y: randomPipeY + openingSpace,
-        width: pipeWidth,
-        height: pipeHeight,
-        passed: false
-    };
+   //  верхняя труба
+   let topPipe={
+       img: topPipeImg,
+       x: pipeX,
+       y: randomPipeY- pipeHeight,
+       width: pipeWidth,
+       height: pipeHeight,
+       passed:false
+   };
 
-    pipeArray.push(topPipe);
-    pipeArray.push(bottomPipe);
+   // нижняя труба
+   let bottomPipe={
+       img: bottomPipeImg,
+       x: pipeX,
+       y: randomPipeY+ openingSpace,
+       width: pipeWidth,
+       height: pipeHeight,
+       passed:false
+   };
 
-    let nextPipeTime = Math.floor(Math.random() * 600) + 1700; // 1700 - 2300 мс
-    setTimeout(placePipes, nextPipeTime);
+   pipeArray.push(topPipe);
+   pipeArray.push(bottomPipe);
+
+   // Следующий запуск через случайное время в диапазоне [1700..2300] мс
+   let nextTime=Math.floor(Math.random()*600)+1700;
+   setTimeout(placePipes,nextTime);
 }
 
-
-// Движение птицы
+// Управление прыжком птицы по клавише пробел или стрелке вверх/Х 
 function moveBird(e) {
-    if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
-        velocityY = jumpStrength;
+   if(e.code== "Space" || e.code== "ArrowUp" || e.code== "KeyX") {
+       velocityY= jumpStrength;
 
-        if (gameOver) {
-            restartGame();
-        }
-    }
+       if(gameOver) restartGame(); // Перезапуск при игре окончена.
+   }
 }
 
-// Перезапуск игры
+// Перезапуск игры — сброс параметров.
 function restartGame() {
-    bird.y = birdY;
-    pipeArray = [];
-    score = 0;
-    gameOver = false;
-    velocityY = 0;
+   bird.y=birdY;
+   pipeArray=[]; 
+   score=0; 
+   gameOver=false; 
+   velocityY=0; 
 }
 
-// Проверка столкновения
-function detectCollision(a, b) {
-    return (
-        a.x < b.x + b.width &&
-        a.x + a.width > b.x &&
-        a.y < b.y + b.height &&
-        a.y + a.height > b.y
-    );
+// Проверка столкновения между объектами.
+function detectCollision(a,b){
+   return (
+       a.x< b.x+ b.width &&
+       a.x+ a.width> b.x &&
+       a.y< b.y+ b.height &&
+       a.y+ a.height> b.y
+   );
 }
