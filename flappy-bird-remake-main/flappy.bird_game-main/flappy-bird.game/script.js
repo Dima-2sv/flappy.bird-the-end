@@ -109,22 +109,22 @@ function createDifficultyMenu() {
 function setDifficulty(level) {
     switch (level) {
         case 'easy':
-            velocityX = -3; // Самый медленный режим
+            velocityX = -4; 
             gravity = 0.1;
             jumpStrength = -4;
-            openingSpace = 180; // Шире проход между трубами
+            openingSpace = 180; 
             break;
         case 'normal':
-            velocityX = -3.5; // Уменьшена скорость труб
+            velocityX = -6; 
             gravity = 0.15;
             jumpStrength = -4;
-            openingSpace = 200; // Пространство между трубами стало больше
+            openingSpace = 200; 
             break;
         case 'hard':
-            velocityX = -4; // Все еще сложный, но управляемый
+            velocityX = -12; 
             gravity = 0.2;
             jumpStrength = -4.5;
-            openingSpace = 220; // Самый широкий проход
+            openingSpace = 220; 
             break;
     }
 }
